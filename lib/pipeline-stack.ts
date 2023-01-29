@@ -7,7 +7,6 @@ import {
   aws_codebuild as codebuild,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { DellEStack } from "./dell-e-stack";
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
