@@ -1,16 +1,15 @@
-import * as cdk from 'aws-cdk-lib';
+import {
+  Stack,
+  StackProps,
+}  from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { S3BucketStack } from './s3-bucket-stack';
 
-export class DellEStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+export class DellEStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const bucketsStack =  new S3BucketStack(this, 'S3BucketStack')
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'DellEQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
   }
 }
