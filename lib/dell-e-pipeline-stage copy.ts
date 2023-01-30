@@ -1,9 +1,9 @@
-import { StackProps, Stack } from "aws-cdk-lib";
+import { StackProps, Stage } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { DynamoStack } from "./dynamo-stack";
 import { S3BucketStack } from "./s3-bucket-stack";
 
-export class DellEStack extends Stack {
+export class DellEPipelineStage extends Stage {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
