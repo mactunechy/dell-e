@@ -1,17 +1,14 @@
+import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import * as AWS from "aws-sdk";
-
-const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
-  const params = {
-    TableName: process.env.TABLE_NAME as string,
-  };
-
+  const tableName = process.env.TABLE_NAME;
   try {
-    const result = await dynamoDB.scan(params).promise();
+    const client = new DynamoDBClient({ region: "us-west-1" });
+    const result = await client.send(new ScanCommand({ TableName: tableName }));
+
     return {
       statusCode: 200,
       body: JSON.stringify(result.Items),

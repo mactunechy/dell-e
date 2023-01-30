@@ -1,17 +1,25 @@
 import { Configuration, OpenAIApi } from "openai";
 import * as AWS from "aws-sdk";
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
 
 const ssm = new AWS.SSM();
 const OPENAI_SECRET_NAME = "dell-e/openai";
 
+const getOpenaiSecret = async () => {
+  const client = new SecretsManagerClient({ region: "us-west-1" });
+  const command = new GetSecretValueCommand({
+    SecretId: OPENAI_SECRET_NAME,
+  });
+  const smResponse = (await client.send(command)) as any;
+  return JSON.parse(smResponse.SecretString);
+};
+
 export const generateImage = async (prompt: string) => {
   try {
-    const getSecretResult = await ssm
-      .getParameter({ Name: OPENAI_SECRET_NAME })
-      .promise();
-
-    const secretJson = getSecretResult.Parameter?.Value;
-    const secret = JSON.parse(secretJson as string);
+    const secret = await getOpenaiSecret();
 
     const configuration = new Configuration({
       apiKey: secret.api_key,
