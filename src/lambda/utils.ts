@@ -39,8 +39,6 @@ export const generateImage = async (prompt: string) => {
       response_format: "b64_json",
     });
 
-    console.log("response", response);
-
     return { b64_image: response.data.data[0].b64_json };
   } catch (err) {
     console.log("Failed to generate image", err);
@@ -62,7 +60,12 @@ export const saveImageToS3 = async (b64_image: string) => {
 
   const command = new PutObjectCommand(params);
 
-  //Signed URL that doesn't expire
-  const signedUrl = await getSignedUrl(s3, command, {});
-  return { imageUrl: signedUrl };
+  try {
+    const data = await s3.send(command);
+    console.log("Success", data);
+    return { imageUrl: "Todo" };
+  } catch (err) {
+    console.log("Failed to upload", err);
+    return { error: true, message: err };
+  }
 };
