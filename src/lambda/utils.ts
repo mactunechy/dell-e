@@ -1,11 +1,12 @@
 import { Configuration, OpenAIApi } from "openai";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3 = new S3Client({ region: "us-west-1" });
 const OPENAI_SECRET_NAME = "dell-e/openai";
@@ -61,12 +62,7 @@ export const saveImageToS3 = async (b64_image: string) => {
 
   const command = new PutObjectCommand(params);
 
-  try {
-    const url = await getSignedUrl(s3, command, {});
-    console.log("url", url);
-    return { imageUrl: url };
-  } catch (error) {
-    console.log("failed to save image", error);
-    throw error;
-  }
+  //Signed URL that doesn't expire
+  const signedUrl = await getSignedUrl(s3, command, {});
+  return { imageUrl: signedUrl };
 };
