@@ -2,6 +2,7 @@ import {
   aws_codepipeline as codepipeline,
   Stack,
   StackProps,
+  aws_codebuild as codebuild,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import {
@@ -28,6 +29,7 @@ export class PipelineStack extends Stack {
       dockerEnabledForSynth: true,
       codeBuildDefaults: {
         buildEnvironment: {
+          buildImage: codebuild.LinuxBuildImage.STANDARD_6_0,
           privileged: true,
         },
       },
