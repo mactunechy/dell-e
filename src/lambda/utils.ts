@@ -14,6 +14,7 @@ const getOpenaiSecret = async () => {
     SecretId: OPENAI_SECRET_NAME,
   });
   const smResponse = (await client.send(command)) as any;
+  console.log("smResponse", smResponse);
   return JSON.parse(smResponse.SecretString);
 };
 
