@@ -56,15 +56,13 @@ export class LambdaStack extends Stack {
       }
     );
 
-    // Grant the lambda permission to read from the bucket
-    props.aiImagesBucket.grantRead(this.getAllPostsLambda);
-
     // Grant the lambda permission to read and write from the the bucket
     props.aiImagesBucket.grantReadWrite(this.createPostLambda);
     props.aiImagesBucket.grantPutAcl(this.createPostLambda);
+    props.aiImagesBucket.grantRead(this.getAllPostsLambda);
 
     // Grant the lambda permission to read from the table
-    props.delletable.grantReadWriteData(this.createPostLambda);
+    props.delletable.grantReadWriteData(this.getAllPostsLambda);
 
     const openaiSecret = ssm.Secret.fromSecretNameV2(
       this,
