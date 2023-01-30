@@ -11,9 +11,12 @@ export const handler = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
+    console.log("event", event);
     const body: IEventBody = JSON.parse(event.body as string);
     const { prompt, author, shouldSave } = body;
     const image = await generateImage(prompt);
+
+    console.log("image", image);
 
     return {
       statusCode: 200,

@@ -22,6 +22,8 @@ export const generateImage = async (prompt: string) => {
   try {
     const secret = await getOpenaiSecret();
 
+    console.log("secret", secret);
+
     const configuration = new Configuration({
       apiKey: secret.api_key,
     });
@@ -33,6 +35,9 @@ export const generateImage = async (prompt: string) => {
       size: "1024x1024",
       response_format: "b64_json",
     });
+
+    console.log("response", response);
+
     return { b64_image: response.data.data[0].b64_json };
   } catch (err) {
     console.log("Failed to generate image", err);
