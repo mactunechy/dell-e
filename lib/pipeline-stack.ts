@@ -22,8 +22,15 @@ export class PipelineStack extends Stack {
           connectionArn:
             "arn:aws:codestar-connections:us-west-1:280031520882:connection/7079e53f-e482-4e95-9c48-60a5a7502c45",
         }),
+
         commands: ["yarn install", "yarn build", "yarn cdk synth"],
       }),
+      dockerEnabledForSynth: true,
+      codeBuildDefaults: {
+        buildEnvironment: {
+          privileged: true,
+        },
+      },
     });
 
     pipeline.addStage(new DellEPipelineStage(this, "Deploy"));
