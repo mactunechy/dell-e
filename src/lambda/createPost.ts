@@ -1,5 +1,5 @@
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { generateImage } from "./utils";
+import { generateImage, saveImageToS3 } from "./utils";
 
 interface IEventBody {
   prompt: string;
@@ -14,13 +14,20 @@ export const handler = async (
     console.log("event", event);
     const body: IEventBody = JSON.parse(event.body as string);
     const { prompt, author, shouldSave } = body;
-    const image = await generateImage(prompt);
+    const generateImageResult = await generateImage(prompt);
 
-    console.log("image", image);
+    if (generateImageResult.error)
+      throw new Error(generateImageResult.message as string);
+
+    const { imageUrl } = await saveImageToS3(
+      generateImageResult.b64_image as string
+    );
+
+    console.log("image ul", imageUrl);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ image, author, shouldSave }),
+      body: JSON.stringify({ imageUrl, author, shouldSave }),
     };
   } catch (error) {
     console.log(error);

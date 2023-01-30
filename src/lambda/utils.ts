@@ -1,11 +1,13 @@
 import { Configuration, OpenAIApi } from "openai";
-import * as AWS from "aws-sdk";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
 
-const ssm = new AWS.SSM();
+const s3 = new S3Client({ region: "us-west-1" });
 const OPENAI_SECRET_NAME = "dell-e/openai";
 
 const getOpenaiSecret = async () => {
@@ -42,5 +44,29 @@ export const generateImage = async (prompt: string) => {
   } catch (err) {
     console.log("Failed to generate image", err);
     return { error: true, message: err };
+  }
+};
+
+export const saveImageToS3 = async (b64_image: string) => {
+  const bucketName = process.env.BUCKET_NAME;
+  const imageName = `${uuidv4()}.jpg`;
+
+  const imageBuffer = Buffer.from(b64_image, "base64");
+
+  const params = {
+    Bucket: bucketName,
+    Key: imageName,
+    Body: imageBuffer,
+  };
+
+  const command = new PutObjectCommand(params);
+
+  try {
+    const url = await getSignedUrl(s3, command, {});
+    console.log("url", url);
+    return { imageUrl: url };
+  } catch (error) {
+    console.log("failed to save image", error);
+    throw error;
   }
 };
