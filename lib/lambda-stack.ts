@@ -6,6 +6,7 @@ import {
   Duration,
   aws_s3 as s3,
   aws_dynamodb as dynamo,
+  aws_secretsmanager as ssm,
 } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as path from "path";
@@ -17,6 +18,7 @@ interface LambdaStackProps extends StackProps {
 
 export class LambdaStack extends Stack {
   public readonly getAllPostsLambda: lambda_nodejs.NodejsFunction;
+  public readonly createPostLambda: lambda_nodejs.NodejsFunction;
 
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
@@ -37,10 +39,35 @@ export class LambdaStack extends Stack {
       }
     );
 
+    this.createPostLambda = new lambda_nodejs.NodejsFunction(
+      this,
+      "CreatePostsLambda",
+      {
+        memorySize: 1024,
+        timeout: Duration.seconds(5),
+        runtime: lambda.Runtime.NODEJS_16_X,
+        handler: "handler",
+        entry: path.join(__dirname, `/../src/lambda/createPost.ts`),
+        environment: {
+          BUCKET_NAME: props.aiImagesBucket.bucketName,
+          TABLE_NAME: props.delletable.tableName,
+        },
+      }
+    );
+
     // Grant the lambda permission to read from the bucket
     props.aiImagesBucket.grantRead(this.getAllPostsLambda);
 
     // Grant the lambda permission to read from the table
     props.delletable.grantReadData(this.getAllPostsLambda);
+
+    const openaiSecret = ssm.Secret.fromSecretNameV2(
+      this,
+      "OpenaiSecret",
+      "dell-e/openai"
+    );
+
+    // Grant the lambda permission to read from the secret
+    openaiSecret.grantRead(this.createPostLambda);
   }
 }

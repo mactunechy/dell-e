@@ -19,6 +19,7 @@ export class DellEStack extends Stack {
 
     new ApiGatewayStack(this, "ApiGatewayStack", {
       getAllPostsLambda: lambdaStack.getAllPostsLambda,
+      createPostLambda: lambdaStack.createPostLambda,
     });
   }
 }

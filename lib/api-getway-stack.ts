@@ -9,6 +9,7 @@ import { Construct } from "constructs";
 
 interface ApiGatewayStackProps extends StackProps {
   getAllPostsLambda: lambda.IFunction;
+  createPostLambda: lambda.IFunction;
 }
 
 export class ApiGatewayStack extends Stack {
@@ -36,10 +37,14 @@ export class ApiGatewayStack extends Stack {
       },
     });
 
-    const getAllPostsEndpoint = api.root.addResource("posts");
-    getAllPostsEndpoint.addMethod(
+    const posts = api.root.addResource("posts");
+    posts.addMethod(
       "GET",
       new apigw.LambdaIntegration(props.getAllPostsLambda, { proxy: true })
+    );
+    posts.addMethod(
+      "POST",
+      new apigw.LambdaIntegration(props.createPostLambda, { proxy: true })
     );
   }
 }
