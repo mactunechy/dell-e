@@ -44,7 +44,7 @@ export class LambdaStack extends Stack {
       "CreatePostsLambda",
       {
         memorySize: 1024,
-        timeout: Duration.seconds(5),
+        timeout: Duration.seconds(10),
         runtime: lambda.Runtime.NODEJS_16_X,
         handler: "handler",
         entry: path.join(__dirname, `/../src/lambda/createPost.ts`),
