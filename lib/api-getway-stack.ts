@@ -14,8 +14,15 @@ export class ApiGatewayStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiGatewayStackProps) {
     super(scope, id, props);
 
-    new apigw.LambdaRestApi(this, "DellEAPI", {
+    const api = new apigw.LambdaRestApi(this, "DellEAPI", {
+      proxy: false,
       handler: props.getAllPostsLambda,
     });
+
+    const getAllPostsEndpoint = api.root.addResource("posts");
+    getAllPostsEndpoint.addMethod(
+      "GET",
+      new apigw.LambdaIntegration(props.getAllPostsLambda)
+    );
   }
 }
