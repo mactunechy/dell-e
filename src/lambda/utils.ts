@@ -61,11 +61,9 @@ export const saveImageToS3 = async (b64_image: string) => {
   const command = new PutObjectCommand(params);
 
   try {
-    const data = await s3.send(command);
-    console.log("Image saved", data);
-    //create a public read url
     const signedUrl = await getSignedUrl(s3, command, {
-      expiresIn: 60 * 60 * 24 * 7,
+      // never expire
+      expiresIn: 60 * 60 * 24 * 365 * 10,
     });
     console.log("signedUrl", signedUrl);
     return { imageUrl: signedUrl };
