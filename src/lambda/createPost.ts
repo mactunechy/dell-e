@@ -1,5 +1,5 @@
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { generateImage, saveImageToS3 } from "./utils";
+import { generateImage, saveImageToS3, savePostToDynamo } from "./utils";
 
 interface IEventBody {
   prompt: string;
@@ -23,11 +23,12 @@ export const handler = async (
       generateImageResult.b64_image as string
     );
 
-    console.log("image ul", imageUrl);
+    if (shouldSave && imageUrl)
+      await savePostToDynamo({ prompt, author, imageUrl });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ imageUrl, author, shouldSave }),
+      body: JSON.stringify({ imageUrl, author, prompt }),
     };
   } catch (error) {
     console.log(error);

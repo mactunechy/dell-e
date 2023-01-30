@@ -7,6 +7,7 @@ import {
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 const s3 = new S3Client({ region: "us-west-1" });
 const OPENAI_SECRET_NAME = "dell-e/openai";
@@ -67,6 +68,33 @@ export const saveImageToS3 = async (b64_image: string) => {
     return { imageUrl: `https://${bucketName}.s3.amazonaws.com/${key}` };
   } catch (err) {
     console.log("Failed to upload", err);
+    return { error: true, message: err };
+  }
+};
+
+export const savePostToDynamo = async (post: {
+  prompt: string;
+  author: string;
+  imageUrl: string;
+}) => {
+  const tableName = process.env.TABLE_NAME;
+  const dynamo = new DynamoDBClient({ region: "us-west-1" });
+
+  const params = {
+    TableName: tableName,
+    Item: {
+      id: { S: uuidv4() },
+      prompt: { S: post.prompt },
+      author: { S: post.author },
+      imageUrl: { S: post.imageUrl },
+    },
+  };
+
+  try {
+    const result = await dynamo.send(new PutItemCommand(params));
+    return { result };
+  } catch (err) {
+    console.log("Failed to save post", err);
     return { error: true, message: err };
   }
 };
