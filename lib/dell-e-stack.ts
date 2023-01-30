@@ -1,6 +1,7 @@
 import { StackProps, Stack } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { DynamoStack } from "./dynamo-stack";
+import { LambdaStack } from "./lambda-stack";
 import { S3BucketStack } from "./s3-bucket-stack";
 
 export class DellEStack extends Stack {
@@ -9,5 +10,6 @@ export class DellEStack extends Stack {
 
     const bucketsStack = new S3BucketStack(this, "S3BucketStack");
     const dynamodbStack = new DynamoStack(this, "DynamoStack");
+    const lambdaStack = new LambdaStack(this, "LambdaStack");
   }
 }
