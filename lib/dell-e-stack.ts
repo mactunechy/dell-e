@@ -9,9 +9,14 @@ export class DellEStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const bucketsStack = new S3BucketStack(this, "S3BucketStack");
-    const dynamodbStack = new DynamoStack(this, "DynamoStack");
     const lambdaStack = new LambdaStack(this, "LambdaStack");
+
+    const bucketsStack = new S3BucketStack(this, "S3BucketStack", {
+      getAllPostsLambda: lambdaStack.getAllPostsLambda,
+    });
+    const dynamodbStack = new DynamoStack(this, "DynamoStack", {
+      getAllPostsLambda: lambdaStack.getAllPostsLambda,
+    });
 
     new ApiGatewayStack(this, "ApiGatewayStack", {
       getAllPostsLambda: lambdaStack.getAllPostsLambda,
