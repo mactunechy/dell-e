@@ -17,8 +17,10 @@ export class ApiGatewayStack extends Stack {
 
     const api = new apigw.RestApi(this, "api", {
       description: "delle-e api gateway",
+      cloudWatchRole: true,
       deployOptions: {
         stageName: "dev",
+        loggingLevel: apigw.MethodLoggingLevel.INFO,
       },
       // 👇 enable CORS
       defaultCorsPreflightOptions: {
