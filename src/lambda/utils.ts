@@ -52,21 +52,19 @@ export const saveImageToS3 = async (b64_image: string) => {
 
   const imageBuffer = Buffer.from(b64_image, "base64");
 
-  const params = {
-    Bucket: bucketName,
-    Key: imageName,
-    Body: imageBuffer,
-  };
-
-  const command = new PutObjectCommand(params);
-
   try {
-    const signedUrl = await getSignedUrl(s3, command, {
-      // never expire
-      expiresIn: 60 * 60 * 24 * 365 * 10,
-    });
-    console.log("signedUrl", signedUrl);
-    return { imageUrl: signedUrl };
+    const key = `images/${Date.now()}`;
+
+    const result = await s3.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+        Body: imageBuffer,
+        ACL: "public-read",
+      })
+    );
+
+    return { imageUrl: `https://${bucketName}.s3.amazonaws.com/${key}` };
   } catch (err) {
     console.log("Failed to upload", err);
     return { error: true, message: err };

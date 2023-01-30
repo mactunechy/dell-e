@@ -14,6 +14,7 @@ export class S3BucketStack extends Stack {
 
     this.aiImagesBucket = new s3.Bucket(this, "MyBucket", {
       bucketName: "dell-e-ai-images",
+      publicReadAccess: true,
     });
   }
 }
